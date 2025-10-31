@@ -14,7 +14,7 @@ window.addEventListener("mousemove", (e) => {
 
 // Smooth cursor follow
 gsap.ticker.add(() => {
-  posX += (mouseX - posX) * 0.25; 
+  posX += (mouseX - posX) * 0.25;
   posY += (mouseY - posY) * 0.25;
   gsap.set(cursor, { x: posX, y: posY });
 });
@@ -23,18 +23,16 @@ gsap.ticker.add(() => {
 document.querySelectorAll(".hoverEffect").forEach(el => {
   el.addEventListener("mouseenter", () => {
     gsap.to(cursor, {
-      scale: 5,                      
-      backgroundColor: "#1100ff71",   
-      borderColor: "transparent",    
-      duration: 0.2,                 
+      scale: 5,
+      backgroundColor: "#8aff4671",
+      duration: 0.2,
       ease: "power1.out"
     });
   });
   el.addEventListener("mouseleave", () => {
     gsap.to(cursor, {
       scale: 1,
-      backgroundColor: "transparent",      
-      borderColor: "black",
+      backgroundColor: "#c1ee1fff",
       duration: 0.2,
       ease: "power1.out"
     });
@@ -47,23 +45,21 @@ const sections = gsap.utils.toArray(".panel");
 
 let scrollTween = gsap.to(sections, {
   xPercent: -100 * (sections.length - 1),
-  ease: "none",
+  ease: "power1.inOut", 
+  duration: 1, 
   scrollTrigger: {
     id: "horizontalScroll",
     trigger: ".horizontal-sections",
     pin: true,
-    scrub: 1,
-    snap: (progress, self) => {
-      const total = sections.length - 1;
-      const scrollDiff = Math.abs(self.scroll() - self.start);
-
-      if (scrollDiff < 100) return false;
-
-      const currentSection = Math.round(progress * total);
-
-      return currentSection / total; 
+    scrub: 0.3, 
+    anticipatePin: 1,
+    snap: {
+      snapTo: 1 / (sections.length - 1),
+      duration: 1,
+      ease: "back.out(1.4)",
     },
-    end: () => "+=" + document.querySelector(".horizontal-sections").offsetWidth,
+    end: () =>
+      "+=" + document.querySelector(".horizontal-sections").offsetWidth * 1.1, // extra space for better flow
   },
 });
 
@@ -71,7 +67,7 @@ let scrollTween = gsap.to(sections, {
 
 
 // ---------------------------------------------------------- animation the menu --------------------------------------------
-const menu = document.querySelector(".nav-links");
+const menu = document.querySelectorAll(".nav-links");
 
 // Clone items to create seamless loop
 const clone = menu.innerHTML;
@@ -79,10 +75,10 @@ menu.innerHTML += clone;
 
 // Animate infinite scroll
 gsap.to(menu, {
-  x: `-50%`,      
-  duration: 20,     
+  x: `-50%`,
+  duration: 20,
   ease: "linear",
-  repeat: -1        
+  repeat: -1
 });
 
 
@@ -101,23 +97,21 @@ document.querySelectorAll(".fade-letters").forEach((el) => {
 // ------------------------------ Split word into Letters ------------------------------------
 document.querySelectorAll(".fade-words").forEach((el) => {
   const text = el.textContent.trim();
-  el.textContent = ""; 
+  el.innerHTML = "";
 
-  // Split text into words
-  const words = text.split(" ");
+  const words = text.split(/\s+/);
 
   words.forEach((word, index) => {
-    // Create a span for each word
-    const wordSpan = document.createElement("span");
-    wordSpan.classList.add("word"); 
-    wordSpan.textContent = word;
+    const span = document.createElement("span");
+    span.classList.add("word");
+    span.textContent = word;
 
-    // Add a space after word except the last one
+    el.appendChild(span);
+
+    // Add a space after each word except the last
     if (index < words.length - 1) {
-      wordSpan.innerHTML += "&nbsp;";
+      el.appendChild(document.createTextNode(" "));
     }
-
-    el.appendChild(wordSpan);
   });
 });
 
@@ -128,11 +122,11 @@ const homeTl = gsap.timeline({ delay: 0.2 });
 homeTl.fromTo(
   ".home >.fade-letters > span",
   { opacity: 0, y: 60 },
-  { 
-    opacity: 1, 
-    y: 0, 
-    ease: "power3.out", 
-    stagger: 0.03 
+  {
+    opacity: 1,
+    y: 0,
+    ease: "power3.out",
+    stagger: 0.03
   }
 );
 
@@ -140,75 +134,134 @@ homeTl.fromTo(
   ".home > h5",
   { opacity: 0, y: 40 },
   { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
-  "-=0.1" 
+  "-=0.1"
 );
 
 homeTl.fromTo(
   ".home > footer",
   { opacity: 0, y: 40 },
   { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
-  "-=0.1" 
+  "-=0.1"
 );
 
 homeTl.fromTo(
   ".home > header",
   { opacity: 0, y: -40 },
   { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
-  "-=0.1" 
+  "-=0.1"
 );
 
 homeTl.fromTo(
   ".home > .vertical-content",
   { opacity: 0, x: -40 },
   { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" },
-  "-=0.1" 
+  "-=0.1"
 );
 
 
 // --- Helper: Timeline for each section ---
-// function createSectionTimeline(sectionSelector, options = {}) {
-//   const tl = gsap.timeline({
-//     scrollTrigger: {
-//       trigger: sectionSelector,
-//       containerAnimation: scrollTween,
-//       start: "left center",
-//       toggleActions: "play none none reverse",
-//       ...options.scrollTrigger,
-//     },
-//   });
+// --- Helper: Timeline for each section ---
+function createSectionTimeline(sectionSelector, options = {}) {
+  // Word fade-in only for .about
+  if (sectionSelector === ".about") {
+    gsap.fromTo(
+      `${sectionSelector} .top-text.fade-words .word`,
+      { opacity: 0 },
+      {
+        opacity: 1,
+        stagger: 0.05,
+        ease: "power2.out",
+        duration: 0.6,
+        scrollTrigger: {
+          trigger: `${sectionSelector}`,
+          containerAnimation: scrollTween,
+          start: "left center",
+          toggleActions: "play none none reverse",
+        },
+      }
+    );
+  }
 
-//   tl.fromTo(
-//     `${sectionSelector} .fade-letters span`,
-//     { opacity: 0, y: 100 },
-//     { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.05 }
-//   );
+  const tlAbout = gsap.timeline({
+    scrollTrigger: {
+      trigger: sectionSelector,
+      containerAnimation: scrollTween,
+      start: "left center",
+      toggleActions: "play none none reverse",
+      ...options.scrollTrigger,
+    },
+  });
 
-//   // Animate paragraph (if exists)
-//   if (document.querySelector(`${sectionSelector} p`)) {
-//     tl.fromTo(
-//       `${sectionSelector} p`,
-//       { opacity: 0, y: 40 },
-//       { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-//       "-=0.3" // overlap with text animation
-//     );
-//   }
+  // Shared animations for all sections
+  tlAbout
+    .fromTo(
+      `${sectionSelector} .h2`,
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+      "-=0.1"
+    )
+    .fromTo(
+      `${sectionSelector} .h1 span`,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.4,
+        ease: "power2.out",
+        stagger: 0.1,
+      },
+      "-=0.1"
+    )
+    .fromTo(
+      `${sectionSelector} > header`,
+      { opacity: 0, y: -40 },
+      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+      "-=0.1"
+    )
+    .fromTo(
+      `${sectionSelector} > .vertical-content`,
+      { opacity: 0, x: -40 },
+      { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" },
+      "-=0.1"
+    )
+    .fromTo(
+      `${sectionSelector} > footer`,
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+      "-=0.1"
+    );
 
-//   // Animate subheading (h5 or h3)
-//   if (document.querySelector(`${sectionSelector} h5`)) {
-//     tl.fromTo(
-//       `${sectionSelector} h5`,
-//       { opacity: 0, y: 60 },
-//       { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
-//       "-=0.4"
-//     );
-//   }
+  return tlAbout;
+}
 
-//   return tl;
-// }
+// --- Initialize for both sections ---
+createSectionTimeline(".about");
+createSectionTimeline(".service");
 
-// // --- About and Contact animations (triggered on scroll) ---
-// createSectionTimeline(".about");
-// createSectionTimeline(".contact");
+
+
+
+const cardGroup = document.querySelector(".card-group");
+const cards = gsap.utils.toArray(".card");
+
+// Duplicate cards for seamless looping
+cardGroup.innerHTML += cardGroup.innerHTML;
+
+// Total width of original cards including gap
+const cardWidth = cards[0].offsetWidth + 24;
+const totalWidth = cardWidth * cards.length;
+
+// Animate the entire card-group
+gsap.to(cards, {
+  x: `+=${totalWidth}`, // move left by total width
+  duration: 8,          // adjust speed
+  ease: "linear",       // smooth continuous motion
+  repeat: -1,           // infinite loop
+  modifiers: {
+    x: gsap.utils.unitize(x => parseFloat(x) % totalWidth) // seamless loop
+  }
+});
+
 
 // --- Refresh ScrollTrigger on resize ---
 window.addEventListener("resize", () => {
