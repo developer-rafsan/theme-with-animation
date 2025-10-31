@@ -10,16 +10,13 @@ Text Domain: gfx
 */
 @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap");
 
+/* website content wrap */
 .wrap {
   max-width: 85%;
   margin: 0 auto;
 }
 
-.wrap-about {
-  max-width: 90%;
-  margin: 0 auto;
-}
-
+/* custom cursor  */
 .custom-cursor {
   width: 40px;
   height: 40px;
@@ -35,20 +32,20 @@ Text Domain: gfx
   transition: background 0.2s, transform 0.1s;
 }
 
+/* for hole site */
 #thynk-unlimited {
   box-sizing: border-box;
-  background: #f5f5f5;
   height: 100%;
   width: 100%;
   overflow-x: hidden;
 
   /* Gradient background */
-  background: linear-gradient(270deg, #cce7ff91, #ffffff, #cce7ff91);
+  background: linear-gradient(270deg, #cce7ff91, #f5f5f5, #cce7ff91);
   background-size: 600% 600%;
   animation: gradientBG 15s ease infinite;
 }
 
-/* Keyframes for smooth gradient transition */
+/* background animation for smooth gradient transition */
 @keyframes gradientBG {
   0% {
     background-position: 0% 50%;
@@ -61,37 +58,196 @@ Text Domain: gfx
   }
 }
 
+/* for horizontal section */
 .horizontal-sections {
   display: flex;
   flex-wrap: nowrap;
   height: 100vh;
 }
 
+/* for all section */
 section {
-  flex: 0 0 100vw;
-  height: 100%;
+  min-width: 100vw;
+  height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   flex-direction: column;
+  overflow: hidden;
   position: relative;
 }
 
+/*
+*********************
+  home section styles 
+*********************
+*/
 section.home {
-  & .logo {
-    width: 150px;
-    z-index: 10;
+  & .h2 {
+    text-transform: uppercase;
+    font-size: 20vw;
+    color: #333;
+    font-weight: 900;
+    font-family: "Oswald", sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1rem;
+    cursor: default;
+    margin-top: -150px;
+    position: relative;
+
+    & span {
+      line-height: 1;
+      display: inline-block;
+      position: relative;
+    }
   }
-  & header {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+
+  & h5 {
+    font-size: 5vw;
+    color: #333;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: "Oswald", sans-serif;
+    letter-spacing: 70px;
+    text-align: center;
+    margin-left: 120px;
+  }
+}
+
+/* Common style */
+section.home .h2::before,
+section.home .h2::after {
+  content: "";
+  position: absolute;
+  height: 3px;
+  background-color: #333;
+  border-radius: 50px;
+  width: 0;
+}
+
+/* Bottom border – Left ➜ Right */
+section.home .h2::after {
+  bottom: -10px;
+  left: 0;
+  animation: borderBottom 3s ease-in-out infinite;
+}
+
+/* Top border – Right ➜ Left */
+section.home .h2::before {
+  top: 0px;
+  right: 0;
+  animation: borderTop 3s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+/* --- Keyframes --- */
+@keyframes borderBottom {
+  0%,
+  100% {
+    width: 0;
+    left: 0;
+    right: auto;
+  }
+  25%,
+  50% {
+    width: 100%;
+    left: 0;
+  }
+  75% {
+    width: 0;
+    left: 100%;
+  }
+}
+
+@keyframes borderTop {
+  0%,
+  100% {
+    width: 0;
+    right: 0;
+    left: auto;
+  }
+  25%,
+  50% {
+    width: 100%;
+    right: 0;
+  }
+  75% {
+    width: 0;
+    right: 100%;
+  }
+}
+
+/*
+*********************
+  about section styles 
+*********************
+*/
+section.about {
+  height: 100%;
+  width: 100%;
+}
+
+/* vertical content */
+.vertical-content {
+  position: fixed;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  z-index: 999;
+
+  & .social-icons li a {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    width: calc(100% - 40px);
-    z-index: 10;
+    justify-content: center;
+    color: #333;
+    transition: color 0.3s;
+  }
+
+  & .social-icons {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  & .email {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  & .social-icons svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+}
+
+/* header section */
+header.site-header {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: calc(100% - 40px);
+  z-index: 10;
+
+  & .logo img {
+    height: 60px;
+    width: auto;
   }
 
   & nav {
@@ -121,149 +277,12 @@ section.home {
       color: initial;
     }
   }
-
-  & .h2 {
-    text-transform: uppercase;
-    font-size: 20vw;
-    color: #333;
-    font-weight: 900;
-    font-family: "Oswald", sans-serif;
-    margin: 0;
-    padding: 0;
-    line-height: 1rem;
-    cursor: default;
-    margin-top: -150px;
-
-    & span {
-      line-height: 1;
-    }
-  }
-
-  & h5 {
-    font-size: 5vw;
-    color: #333;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-family: "Oswald", sans-serif;
-    letter-spacing: 70px;
-    text-align: center;
-    margin-left: 120px;
-  }
-
-  & .social-icons svg {
-    width: 24px;
-    height: 24px;
-    fill: currentColor;
-  }
-  .vertical-content {
-    position: fixed;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    z-index: 999;
-  }
-
-  .social-icons li a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #333;
-    transition: color 0.3s;
-  }
-
-  .vertical-content .social-icons {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .vertical-content .email {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-size: 18px;
-    color: #333;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  footer {
-    position: absolute;
-    bottom: 10px;
-    font-size: 0.8rem;
-    color: #666;
-  }
 }
 
-.panel {
-  width: 100vw;
-  height: 98vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.fade-letters span {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(50px);
-}
-
-
-
-
-
-section.about {
-  flex-direction: row;
-}
-
-section.about .left-site {
-  width: 50%;
-}
-
-section.about .right-site {
-  width: 50%;
-  height: 100%;
-  background: url("http://localhost:8881/wp-content/uploads/2025/10/young-male-blogger-recording-station-scaled.jpg") no-repeat center center/cover;
-}
-
-section.about h2 {
-  font-size: 8vw;
-  color: #333;
-  font-weight: 900;
-  font-family: "Oswald", sans-serif;
-  margin: 0;
-  padding: 0;
-  cursor: default;
-}
-
-section.about p {
-  font-size: 1.6rem;
-  color: #555;
-  line-height: 1.6;
-  max-width: 90%;
-  font-weight: bold;
+/* footer section */
+footer {
   position: absolute;
-  top: 0;
-  left: 0;
-}
-
-section.about .content-wrapper {
-  position: relative;
-  height: 500px;
-}
-
-section.about .content-wrapper p:nth-child(1) {
-  opacity: .5;
-}
-section.about .content-wrapper p:nth-child(2) {
-  opacity: 0;
+  bottom: 10px;
+  font-size: 0.8rem;
+  color: #666;
 }

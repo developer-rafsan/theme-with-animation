@@ -101,7 +101,7 @@ document.querySelectorAll(".fade-letters").forEach((el) => {
 // ------------------------------ Split word into Letters ------------------------------------
 document.querySelectorAll(".fade-words").forEach((el) => {
   const text = el.textContent.trim();
-  el.textContent = ""; // Clear original text
+  el.textContent = ""; 
 
   // Split text into words
   const words = text.split(" ");
@@ -109,7 +109,7 @@ document.querySelectorAll(".fade-words").forEach((el) => {
   words.forEach((word, index) => {
     // Create a span for each word
     const wordSpan = document.createElement("span");
-    wordSpan.classList.add("word"); // optional class for styling
+    wordSpan.classList.add("word"); 
     wordSpan.textContent = word;
 
     // Add a space after word except the last one
@@ -121,10 +121,12 @@ document.querySelectorAll(".fade-words").forEach((el) => {
   });
 });
 
+
+
 // ---------------------------------------------------------- home page --------------------------------------------
 const homeTl = gsap.timeline({ delay: 0.2 });
 homeTl.fromTo(
-  ".home .fade-letters span",
+  ".home >.fade-letters > span",
   { opacity: 0, y: 60 },
   { 
     opacity: 1, 
@@ -135,28 +137,28 @@ homeTl.fromTo(
 );
 
 homeTl.fromTo(
-  ".home h5",
+  ".home > h5",
   { opacity: 0, y: 40 },
   { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
   "-=0.1" 
 );
 
 homeTl.fromTo(
-  ".home footer",
+  ".home > footer",
   { opacity: 0, y: 40 },
   { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
   "-=0.1" 
 );
 
 homeTl.fromTo(
-  ".home header",
+  ".home > header",
   { opacity: 0, y: -40 },
   { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
   "-=0.1" 
 );
 
 homeTl.fromTo(
-  ".home .vertical-content",
+  ".home > .vertical-content",
   { opacity: 0, x: -40 },
   { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" },
   "-=0.1" 
@@ -164,49 +166,49 @@ homeTl.fromTo(
 
 
 // --- Helper: Timeline for each section ---
-function createSectionTimeline(sectionSelector, options = {}) {
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: sectionSelector,
-      containerAnimation: scrollTween,
-      start: "left center",
-      toggleActions: "play none none reverse",
-      ...options.scrollTrigger,
-    },
-  });
+// function createSectionTimeline(sectionSelector, options = {}) {
+//   const tl = gsap.timeline({
+//     scrollTrigger: {
+//       trigger: sectionSelector,
+//       containerAnimation: scrollTween,
+//       start: "left center",
+//       toggleActions: "play none none reverse",
+//       ...options.scrollTrigger,
+//     },
+//   });
 
-  tl.fromTo(
-    `${sectionSelector} .fade-letters span`,
-    { opacity: 0, y: 100 },
-    { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.05 }
-  );
+//   tl.fromTo(
+//     `${sectionSelector} .fade-letters span`,
+//     { opacity: 0, y: 100 },
+//     { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.05 }
+//   );
 
-  // Animate paragraph (if exists)
-  if (document.querySelector(`${sectionSelector} p`)) {
-    tl.fromTo(
-      `${sectionSelector} p`,
-      { opacity: 0, y: 40 },
-      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-      "-=0.3" // overlap with text animation
-    );
-  }
+//   // Animate paragraph (if exists)
+//   if (document.querySelector(`${sectionSelector} p`)) {
+//     tl.fromTo(
+//       `${sectionSelector} p`,
+//       { opacity: 0, y: 40 },
+//       { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+//       "-=0.3" // overlap with text animation
+//     );
+//   }
 
-  // Animate subheading (h5 or h3)
-  if (document.querySelector(`${sectionSelector} h5`)) {
-    tl.fromTo(
-      `${sectionSelector} h5`,
-      { opacity: 0, y: 60 },
-      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
-      "-=0.4"
-    );
-  }
+//   // Animate subheading (h5 or h3)
+//   if (document.querySelector(`${sectionSelector} h5`)) {
+//     tl.fromTo(
+//       `${sectionSelector} h5`,
+//       { opacity: 0, y: 60 },
+//       { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+//       "-=0.4"
+//     );
+//   }
 
-  return tl;
-}
+//   return tl;
+// }
 
-// --- About and Contact animations (triggered on scroll) ---
-createSectionTimeline(".about");
-createSectionTimeline(".contact");
+// // --- About and Contact animations (triggered on scroll) ---
+// createSectionTimeline(".about");
+// createSectionTimeline(".contact");
 
 // --- Refresh ScrollTrigger on resize ---
 window.addEventListener("resize", () => {
