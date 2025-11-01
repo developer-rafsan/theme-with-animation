@@ -24,7 +24,7 @@ document.querySelectorAll(".hoverEffect").forEach(el => {
   el.addEventListener("mouseenter", () => {
     gsap.to(cursor, {
       scale: 5,
-      backgroundColor: "#8aff4671",
+      backgroundColor: "#ffffffff",
       duration: 0.2,
       ease: "power1.out"
     });
@@ -32,7 +32,7 @@ document.querySelectorAll(".hoverEffect").forEach(el => {
   el.addEventListener("mouseleave", () => {
     gsap.to(cursor, {
       scale: 1,
-      backgroundColor: "#c1ee1fff",
+      backgroundColor: "#ffffffff",
       duration: 0.2,
       ease: "power1.out"
     });
@@ -45,21 +45,20 @@ const sections = gsap.utils.toArray(".panel");
 
 let scrollTween = gsap.to(sections, {
   xPercent: -100 * (sections.length - 1),
-  ease: "power1.inOut", 
-  duration: 1, 
+  ease: "none",
   scrollTrigger: {
     id: "horizontalScroll",
     trigger: ".horizontal-sections",
     pin: true,
-    scrub: 0.3, 
+    scrub: 0.6,
     anticipatePin: 1,
     snap: {
       snapTo: 1 / (sections.length - 1),
-      duration: 1,
+      duration: 0.6,
       ease: "back.out(1.4)",
     },
     end: () =>
-      "+=" + document.querySelector(".horizontal-sections").offsetWidth * 1.1, // extra space for better flow
+      "+=" + document.querySelector(".horizontal-sections").offsetWidth * 1.1,
   },
 });
 
@@ -125,16 +124,10 @@ homeTl.fromTo(
   {
     opacity: 1,
     y: 0,
+    duration: 1.5,
     ease: "power3.out",
     stagger: 0.03
   }
-);
-
-homeTl.fromTo(
-  ".home > h5",
-  { opacity: 0, y: 40 },
-  { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
-  "-=0.1"
 );
 
 homeTl.fromTo(
@@ -159,27 +152,48 @@ homeTl.fromTo(
 );
 
 
-// --- Helper: Timeline for each section ---
-// --- Helper: Timeline for each section ---
+// ------------------------------------------ Timeline for each section --------------------------------------------------------
 function createSectionTimeline(sectionSelector, options = {}) {
   // Word fade-in only for .about
-  if (sectionSelector === ".about") {
+  if (sectionSelector === ".about" || sectionSelector === ".service" || sectionSelector === ".contact") {
     gsap.fromTo(
       `${sectionSelector} .top-text.fade-words .word`,
       { opacity: 0 },
       {
         opacity: 1,
         stagger: 0.05,
+        duration: .6,
         ease: "power2.out",
-        duration: 0.6,
         scrollTrigger: {
           trigger: `${sectionSelector}`,
           containerAnimation: scrollTween,
           start: "left center",
-          toggleActions: "play none none reverse",
+          toggleActions: "restart none restart none",
+          onEnter: (self) => self.animation.restart(),
+          onEnterBack: (self) => self.animation.restart(),
         },
       }
     );
+
+    // select your heading
+    const title = document.querySelector(`${sectionSelector}` + " .h2");
+    gsap.to(title, {
+      "--beforeWidth": "100%",
+      stagger: 0.05,
+      duration: 1,
+      delay: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: `${sectionSelector}`,
+        containerAnimation: scrollTween,
+        start: "left center",
+        toggleActions: "restart none restart none",
+        onEnter: (self) => self.animation.restart(),
+        onEnterBack: (self) => self.animation.restart(),
+      },
+    });
+
+
   }
 
   const tlAbout = gsap.timeline({
@@ -187,7 +201,9 @@ function createSectionTimeline(sectionSelector, options = {}) {
       trigger: sectionSelector,
       containerAnimation: scrollTween,
       start: "left center",
-      toggleActions: "play none none reverse",
+      toggleActions: "restart none restart none",
+      onEnter: (self) => self.animation.restart(),
+      onEnterBack: (self) => self.animation.restart(),
       ...options.scrollTrigger,
     },
   });
@@ -195,39 +211,33 @@ function createSectionTimeline(sectionSelector, options = {}) {
   // Shared animations for all sections
   tlAbout
     .fromTo(
-      `${sectionSelector} .h2`,
-      { opacity: 0, y: 40 },
-      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
-      "-=0.1"
-    )
-    .fromTo(
       `${sectionSelector} .h1 span`,
       { opacity: 0, y: 40 },
       {
         opacity: 1,
         y: 0,
-        duration: 0.4,
+        duration: 1,
         ease: "power2.out",
-        stagger: 0.1,
+        stagger: 0.3,
       },
       "-=0.1"
     )
     .fromTo(
       `${sectionSelector} > header`,
       { opacity: 0, y: -40 },
-      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
       "-=0.1"
     )
     .fromTo(
       `${sectionSelector} > .vertical-content`,
       { opacity: 0, x: -40 },
-      { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" },
+      { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" },
       "-=0.1"
     )
     .fromTo(
       `${sectionSelector} > footer`,
       { opacity: 0, y: 40 },
-      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
       "-=0.1"
     );
 
@@ -237,33 +247,60 @@ function createSectionTimeline(sectionSelector, options = {}) {
 // --- Initialize for both sections ---
 createSectionTimeline(".about");
 createSectionTimeline(".service");
+createSectionTimeline(".contact");
 
 
 
 
-const cardGroup = document.querySelector(".card-group");
-const cards = gsap.utils.toArray(".card");
+// ---------------------------------------------------------- cards for infinite scroll --------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  const track = document.querySelector(".card-track");
+  if (!track) return;
 
-// Duplicate cards for seamless looping
-cardGroup.innerHTML += cardGroup.innerHTML;
-
-// Total width of original cards including gap
-const cardWidth = cards[0].offsetWidth + 24;
-const totalWidth = cardWidth * cards.length;
-
-// Animate the entire card-group
-gsap.to(cards, {
-  x: `+=${totalWidth}`, // move left by total width
-  duration: 8,          // adjust speed
-  ease: "linear",       // smooth continuous motion
-  repeat: -1,           // infinite loop
-  modifiers: {
-    x: gsap.utils.unitize(x => parseFloat(x) % totalWidth) // seamless loop
-  }
+  // Duplicate all cards for seamless infinite scroll
+  const cards = Array.from(track.children);
+  cards.forEach(card => {
+    const clone = card.cloneNode(true);
+    track.appendChild(clone);
+  });
 });
 
 
-// --- Refresh ScrollTrigger on resize ---
+
+// ---------------------------------------------------------- floating shapes --------------------------------------------
+const container = document.querySelector(".floating-shapes");
+const shapes = ["+", "-", "o", "◆", "◇", "▲", "▼"];
+
+function createShape() {
+  const span = document.createElement("span");
+  span.innerText = shapes[Math.floor(Math.random() * shapes.length)];
+
+  // Random position
+  span.style.left = Math.random() * window.innerWidth + "px";
+  span.style.top = Math.random() * window.innerHeight + "px";
+
+  // Random size & color
+  const size = Math.random() * 30 + 10; // 10px - 40px
+  span.style.fontSize = size + "px";
+  span.style.color = `rgba(0,0,0,${Math.random() * 0.5 + 0.2})`;
+
+  // Random animation duration
+  span.style.animationDuration = Math.random() * 3 + 2 + "s";
+
+  container.appendChild(span);
+
+  // Remove element after animation
+  span.addEventListener("animationend", () => {
+    span.remove();
+  });
+}
+// Create shapes continuously
+setInterval(createShape, 200);
+
+
+
+
+//  ---------------------------------------------------------- Refresh ScrollTrigger on resize ----------------------------------------------------------
 window.addEventListener("resize", () => {
   ScrollTrigger.refresh();
 });
