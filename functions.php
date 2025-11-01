@@ -3,42 +3,47 @@
  * Enqueue parent & child theme styles + GSAP + custom JS
  */
 function hello_elementor_child_enqueue_assets() {
-    // Load parent and child styles
+
+    // Parent style
     wp_enqueue_style(
         'hello-elementor-style',
-        get_template_directory_uri() . '/style.css'
+        get_template_directory_uri() . '/style.css',
+        array(),
+        wp_get_theme('Hello Elementor')->get('Version')
     );
 
+    // Child style (depends on parent)
     wp_enqueue_style(
         'hello-elementor-child-style',
         get_stylesheet_directory_uri() . '/style.css',
         array('hello-elementor-style'),
         wp_get_theme()->get('Version')
     );
-    
-    // GSAP + ScrollTrigger
+
+    // Load GSAP + ScrollTrigger from CDN (only once)
+    $gsap_cdn = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/';
     wp_enqueue_script(
         'gsap',
-        'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js',
+        $gsap_cdn . 'gsap.min.js',
         array(),
-        null,
+        '3.12.2',
         true
     );
 
     wp_enqueue_script(
-        'scrolltrigger',
-        'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js',
+        'gsap-scrolltrigger',
+        $gsap_cdn . 'ScrollTrigger.min.js',
         array('gsap'),
-        null,
+        '3.12.2',
         true
     );
 
-    // Main JS file
+    // Main JS (defer loading till end, versioned)
     wp_enqueue_script(
-        'main-js',
+        'child-main-js',
         get_stylesheet_directory_uri() . '/assets/main.js',
-        array('gsap', 'scrolltrigger'),
-        wp_get_theme()->get('Version'),
+        array('gsap', 'gsap-scrolltrigger'),
+        filemtime(get_stylesheet_directory() . '/assets/main.js'), // cache busting
         true
     );
 }

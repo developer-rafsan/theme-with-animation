@@ -262,6 +262,11 @@ section.service {
     color: #324dac;
     text-align: right;
     margin-top: -50px;
+
+    & span {
+      display: inline-block;
+      margin-right: 10px;
+    }
   }
 
   & .card-slider {
@@ -297,7 +302,6 @@ section.service {
   & .card-track {
     display: flex;
     gap: 20px;
-    animation: slide 15s linear infinite;
   }
 
   & .card {
@@ -360,25 +364,10 @@ section.service {
 
   & .card:hover img {
     height: 230px;
-    width: 90%;
+    width: 95%;
     top: 15px;
     border-radius: 15px;
   }
-}
-
-/* Infinite sliding animation */
-@keyframes slide {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-92%);
-  }
-}
-
-/* Optional: pause on hover */
-.card-slider:hover .card-track {
-  animation-play-state: paused;
 }
 
 section.contact {
@@ -439,6 +428,11 @@ section.contact {
     color: #324dac;
     text-align: right;
     margin-top: -50px;
+
+    & span {
+      display: inline-block;
+      margin-right: 10px;
+    }
   }
 
   & .contact-form {
@@ -454,6 +448,8 @@ section.contact {
     padding: 30px;
     border-radius: 15px;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.035);
+    opacity: 0;
+    scale: 0.8;
 
     & .h2 {
       margin-bottom: 20px;
@@ -471,6 +467,8 @@ section.contact {
 
   & .right-site {
     width: 50%;
+    opacity: 0;
+    scale: 0.8;
 
     & form {
       padding: 0px 40px;

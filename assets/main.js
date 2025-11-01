@@ -1,306 +1,198 @@
 gsap.registerPlugin(ScrollTrigger);
 
-// ------------------------------------------------ Custom Cursor Setup --------------------------------------------
+// ------------------------------------------------ Custom Cursor --------------------------------------------
 const cursor = document.querySelector(".custom-cursor");
+let mouseX = 0, mouseY = 0, posX = 0, posY = 0;
 
-let mouseX = 0, mouseY = 0;
-let posX = 0, posY = 0;
-
-// Track mouse movement
-window.addEventListener("mousemove", (e) => {
+window.addEventListener("mousemove", e => {
   mouseX = e.clientX;
   mouseY = e.clientY;
 });
 
-// Smooth cursor follow
 gsap.ticker.add(() => {
-  posX += (mouseX - posX) * 0.25;
-  posY += (mouseY - posY) * 0.25;
+  posX += (mouseX - posX) * 0.35; // slightly faster follow
+  posY += (mouseY - posY) * 0.35;
   gsap.set(cursor, { x: posX, y: posY });
 });
 
-// Hover effect on links / special elements
 document.querySelectorAll(".hoverEffect").forEach(el => {
-  el.addEventListener("mouseenter", () => {
-    gsap.to(cursor, {
-      scale: 5,
-      backgroundColor: "#ffffffff",
-      duration: 0.2,
-      ease: "power1.out"
-    });
-  });
-  el.addEventListener("mouseleave", () => {
-    gsap.to(cursor, {
-      scale: 1,
-      backgroundColor: "#ffffffff",
-      duration: 0.2,
-      ease: "power1.out"
-    });
-  });
+  el.addEventListener("mouseenter", () => gsap.to(cursor, {
+    scale: 5,
+    backgroundColor: "#ffffff",
+    duration: 0.15, // faster transition
+    ease: "power2.out"
+  }));
+  el.addEventListener("mouseleave", () => gsap.to(cursor, {
+    scale: 1,
+    backgroundColor: "#ffffff",
+    duration: 0.15,
+    ease: "power2.out"
+  }));
 });
 
 
-// --------------------------------------------------- setup horizontal scroll --------------------------------------------
+// ------------------------------------------------ Horizontal Scroll --------------------------------------------
 const sections = gsap.utils.toArray(".panel");
-
-let scrollTween = gsap.to(sections, {
+const horizontalScroll = gsap.to(sections, {
   xPercent: -100 * (sections.length - 1),
   ease: "none",
   scrollTrigger: {
-    id: "horizontalScroll",
     trigger: ".horizontal-sections",
     pin: true,
-    scrub: 0.6,
+    scrub: 0.8, // faster scrub
     anticipatePin: 1,
-    snap: {
-      snapTo: 1 / (sections.length - 1),
-      duration: 0.6,
-      ease: "back.out(1.4)",
-    },
-    end: () =>
-      "+=" + document.querySelector(".horizontal-sections").offsetWidth * 1.1,
+    snap: { snapTo: 1 / (sections.length - 1), duration: 0.5, ease: "power2.inOut" },
+    end: () => "+=" + document.querySelector(".horizontal-sections").offsetWidth * 1.1,
   },
 });
 
 
-
-
-// ---------------------------------------------------------- animation the menu --------------------------------------------
+// ------------------------------------------------ Infinite Menu Scroll --------------------------------------------
 const menu = document.querySelectorAll(".nav-links");
-
-// Clone items to create seamless loop
-const clone = menu.innerHTML;
-menu.innerHTML += clone;
-
-// Animate infinite scroll
-gsap.to(menu, {
-  x: `-50%`,
-  duration: 20,
-  ease: "linear",
-  repeat: -1
-});
-
-
-
-// ------------------------------ Split Text into Letters ------------------------------------
-document.querySelectorAll(".fade-letters").forEach((el) => {
-  const text = el.textContent;
-  el.textContent = "";
-  text.split("").forEach((letter) => {
-    const span = document.createElement("span");
-    span.textContent = letter;
-    el.appendChild(span);
+if (menu) {
+  menu.innerHTML += menu.innerHTML;
+  gsap.to(menu, {
+    x: "-50%",
+    duration: 15, // faster loop
+    ease: "none",
+    repeat: -1
   });
-});
+}
 
-// ------------------------------ Split word into Letters ------------------------------------
-document.querySelectorAll(".fade-words").forEach((el) => {
-  const text = el.textContent.trim();
-  el.innerHTML = "";
 
-  const words = text.split(/\s+/);
-
-  words.forEach((word, index) => {
-    const span = document.createElement("span");
-    span.classList.add("word");
-    span.textContent = word;
-
-    el.appendChild(span);
-
-    // Add a space after each word except the last
-    if (index < words.length - 1) {
-      el.appendChild(document.createTextNode(" "));
-    }
+// ------------------------------------------------ Split Texts --------------------------------------------
+function splitText(selector, byWord = false) {
+  document.querySelectorAll(selector).forEach(el => {
+    const text = el.textContent.trim();
+    el.textContent = "";
+    const parts = byWord ? text.split(/\s+/) : text.split("");
+    parts.forEach((part, i) => {
+      const span = document.createElement("span");
+      span.textContent = part;
+      if (byWord) span.classList.add("word");
+      el.appendChild(span);
+      if (byWord && i < parts.length - 1) el.appendChild(document.createTextNode(" "));
+    });
   });
-});
+}
+splitText(".fade-letters");
+splitText(".fade-words", true);
 
 
-
-// ---------------------------------------------------------- home page --------------------------------------------
-const homeTl = gsap.timeline({ delay: 0.2 });
-homeTl.fromTo(
-  ".home >.fade-letters > span",
-  { opacity: 0, y: 60 },
-  {
-    opacity: 1,
-    y: 0,
-    duration: 1.5,
-    ease: "power3.out",
-    stagger: 0.03
-  }
-);
-
-homeTl.fromTo(
-  ".home > footer",
-  { opacity: 0, y: 40 },
-  { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
-  "-=0.1"
-);
-
-homeTl.fromTo(
-  ".home > header",
-  { opacity: 0, y: -40 },
-  { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
-  "-=0.1"
-);
-
-homeTl.fromTo(
-  ".home > .vertical-content",
-  { opacity: 0, x: -40 },
-  { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" },
-  "-=0.1"
-);
+// ------------------------------------------------ Home Page Animation --------------------------------------------
+const homeTl = gsap.timeline({ delay: 0.1 });
+homeTl.fromTo(".home > .fade-letters > span", { opacity: 0, y: 60 }, {
+  opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.06
+})
+  .fromTo(".home > footer", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.3 }, "-=0.1")
+  .fromTo(".home > header", { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: 0.3 }, "-=0.1")
+  .fromTo(".home > .vertical-content", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.3 }, "-=0.1");
 
 
-// ------------------------------------------ Timeline for each section --------------------------------------------------------
-function createSectionTimeline(sectionSelector, options = {}) {
-  // Word fade-in only for .about
-  if (sectionSelector === ".about" || sectionSelector === ".service" || sectionSelector === ".contact") {
-    gsap.fromTo(
-      `${sectionSelector} .top-text.fade-words .word`,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        stagger: 0.05,
-        duration: .6,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: `${sectionSelector}`,
-          containerAnimation: scrollTween,
-          start: "left center",
-          toggleActions: "restart none restart none",
-          onEnter: (self) => self.animation.restart(),
-          onEnterBack: (self) => self.animation.restart(),
-        },
-      }
-    );
+// ------------------------------------------------ Section Timeline Function --------------------------------------------
+function createSectionTimeline(section) {
+  if (!document.querySelector(section)) return;
 
-    // select your heading
-    const title = document.querySelector(`${sectionSelector}` + " .h2");
-    gsap.to(title, {
-      "--beforeWidth": "100%",
+  if ([".about", ".service", ".contact"].includes(section)) {
+    gsap.fromTo(`${section} .top-text.fade-words .word`, { opacity: 0 }, {
+      opacity: 1,
       stagger: 0.05,
-      duration: 1,
-      delay: 1,
+      duration: 0.6,
       ease: "power2.out",
       scrollTrigger: {
-        trigger: `${sectionSelector}`,
-        containerAnimation: scrollTween,
+        trigger: section,
+        containerAnimation: horizontalScroll,
         start: "left center",
         toggleActions: "restart none restart none",
-        onEnter: (self) => self.animation.restart(),
-        onEnterBack: (self) => self.animation.restart(),
-      },
+        onEnter: self => self.animation.restart(),
+        onEnterBack: self => self.animation.restart(),
+      }
     });
 
-
+    const title = document.querySelector(`${section} .h2`);
+    if (title) {
+      gsap.to(title, {
+        "--beforeWidth": "100%",
+        duration: 0.9, // faster
+        delay: 0.3,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: section,
+          containerAnimation: horizontalScroll,
+          start: "left center",
+          toggleActions: "restart none restart none",
+          onEnter: self => self.animation.restart(),
+          onEnterBack: self => self.animation.restart(),
+        },
+      });
+    }
   }
 
-  const tlAbout = gsap.timeline({
+  const tl = gsap.timeline({
     scrollTrigger: {
-      trigger: sectionSelector,
-      containerAnimation: scrollTween,
+      trigger: section,
+      containerAnimation: horizontalScroll,
       start: "left center",
       toggleActions: "restart none restart none",
-      onEnter: (self) => self.animation.restart(),
-      onEnterBack: (self) => self.animation.restart(),
-      ...options.scrollTrigger,
+      onEnter: self => self.animation.restart(),
+      onEnterBack: self => self.animation.restart(),
     },
   });
 
-  // Shared animations for all sections
-  tlAbout
-    .fromTo(
-      `${sectionSelector} .h1 span`,
-      { opacity: 0, y: 40 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        ease: "power2.out",
-        stagger: 0.3,
-      },
-      "-=0.1"
-    )
-    .fromTo(
-      `${sectionSelector} > header`,
-      { opacity: 0, y: -40 },
-      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-      "-=0.1"
-    )
-    .fromTo(
-      `${sectionSelector} > .vertical-content`,
-      { opacity: 0, x: -40 },
-      { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" },
-      "-=0.1"
-    )
-    .fromTo(
-      `${sectionSelector} > footer`,
-      { opacity: 0, y: 40 },
-      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-      "-=0.1"
+  tl.fromTo(`${section} .h1 span`, { opacity: 0, y: 60 }, {
+    opacity: 1, y: 0, duration: 0.8, ease: "power2.out", stagger: 0.6
+  })
+    .fromTo(`${section} > header`, { opacity: 0, y: -60 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.2")
+    .fromTo(`${section} > .vertical-content`, { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.5 }, "-=0.2")
+    .fromTo(`${section} > footer`, { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.2")
+  if (document.querySelector(`.contact`)) {
+    tl.to(
+      [`.contact .right-site`, `.contact .left-site`], 
+      { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" }, // zoom to normal size
+      "-=0.2"
     );
-
-  return tlAbout;
+  }
 }
 
-// --- Initialize for both sections ---
-createSectionTimeline(".about");
-createSectionTimeline(".service");
-createSectionTimeline(".contact");
+[".about", ".service", ".contact"].forEach(createSectionTimeline);
 
 
-
-
-// ---------------------------------------------------------- cards for infinite scroll --------------------------------------------
-document.addEventListener("DOMContentLoaded", () => {
-  const track = document.querySelector(".card-track");
-  if (!track) return;
-
-  // Duplicate all cards for seamless infinite scroll
-  const cards = Array.from(track.children);
-  cards.forEach(card => {
-    const clone = card.cloneNode(true);
-    track.appendChild(clone);
-  });
-});
-
-
-
-// ---------------------------------------------------------- floating shapes --------------------------------------------
+// ------------------------------------------------ Floating Shapes --------------------------------------------
 const container = document.querySelector(".floating-shapes");
-const shapes = ["+", "-", "o", "◆", "◇", "▲", "▼"];
-
-function createShape() {
-  const span = document.createElement("span");
-  span.innerText = shapes[Math.floor(Math.random() * shapes.length)];
-
-  // Random position
-  span.style.left = Math.random() * window.innerWidth + "px";
-  span.style.top = Math.random() * window.innerHeight + "px";
-
-  // Random size & color
-  const size = Math.random() * 30 + 10; // 10px - 40px
-  span.style.fontSize = size + "px";
-  span.style.color = `rgba(0,0,0,${Math.random() * 0.5 + 0.2})`;
-
-  // Random animation duration
-  span.style.animationDuration = Math.random() * 3 + 2 + "s";
-
-  container.appendChild(span);
-
-  // Remove element after animation
-  span.addEventListener("animationend", () => {
-    span.remove();
-  });
+if (container) {
+  const shapes = ["+", "-", "o", "◆", "◇", "▲", "▼"];
+  const createShape = () => {
+    const span = document.createElement("span");
+    span.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+    span.style.left = Math.random() * window.innerWidth + "px";
+    span.style.top = Math.random() * window.innerHeight + "px";
+    span.style.fontSize = Math.random() * 25 + 10 + "px"; // smaller
+    span.style.color = `rgba(0,0,0,${Math.random() * 0.5 + 0.2})`;
+    span.style.animationDuration = Math.random() * 2 + 1 + "s"; // faster float
+    container.appendChild(span);
+    span.addEventListener("animationend", () => span.remove());
+  };
+  setInterval(createShape, 150); // spawn faster
 }
-// Create shapes continuously
-setInterval(createShape, 200);
 
+// ------------------------------------------------ Card Slider --------------------------------------------
 
+const track = document.querySelector(".card-track");
+const cards = document.querySelectorAll(".card");
+const cardWidth = cards[0].offsetWidth + 20; // card width + gap
 
+// Duplicate the cards to make infinite loop
+track.innerHTML += track.innerHTML;
 
-//  ---------------------------------------------------------- Refresh ScrollTrigger on resize ----------------------------------------------------------
-window.addEventListener("resize", () => {
-  ScrollTrigger.refresh();
+const totalWidth = cardWidth * cards.length;
+
+gsap.to(track, {
+  x: `-${totalWidth}px`,
+  ease: "linear",
+  duration: 20, // adjust speed
+  repeat: -1,
 });
+
+
+// ------------------------------------------------ Refresh on Resize --------------------------------------------
+window.addEventListener("resize", () => ScrollTrigger.refresh());
